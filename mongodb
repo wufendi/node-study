@@ -1,0 +1,23 @@
+1.shell使用命令：
+    ./mongo --port 27017
+    show dbs
+    show collections
+    show users
+    use dbname
+    db.account.save(json)
+    db.account.find()
+    db.dropDatabase()
+
+
+2.赛程 / 数据
+   1.http://china.nba.com/static/data/team/standing_lakers.json 教练
+   2.http://china.nba.com/static/data/team/schedule_lakers.json 球队赛程
+   3.http://china.nba.com/static/data/team/stats_rockets.json 数据
+
+
+   rebsPg 场均篮板
+   blocksPg 盖帽
+   pointsPg 场均得分
+   assistsPg 场均助攻
+   tppct 三分%
+   ftpct 罚球%
