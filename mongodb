@@ -1,12 +1,23 @@
 1.shell使用命令：
     ./mongo --port 27017
-    show dbs
+    show dbs // 显示所有库
     show collections
+    show tables
     show users
-    use dbname
+    use dbname // 有就进入，无就创建
     db.account.save(json)
     db.account.find()
-    db.dropDatabase()
+    db.dropDatabase() // 删除所在库
+    db.collection.drop() // 删除集合
+    db.COLLECTION_NAME.remove( <query>,{justOne: <boolean>, writeConcern: <document>})// 删除文档
+    db.COLLECTION_NAME.deleteOne( { status: "D" } ) // 删除文档
+    db.COLLECTION_NAME.deleteMany({}) // 删除文档
+    db.createCollection(name, options) // 创建集合
+    db.COLLECTION_NAME.insert(document) // 插入文档
+    db.COLLECTION_NAME.save(document) // 插入文档    如果不指定 _id 字段 save() 方法类似于 insert() 方法。如果指定 _id 字段，则会更新该 _id 的数据。
+    db.COLLECTION_NAME.update(<query>,<update>,{ upsert: <boolean>,multi: <boolean>, writeConcern: <document>}) // 文档更新
+    db.COLLECTION_NAME.find() // 查询文档
+    db.COLLECTION_NAME.findOne() // 查询文档
 
 
 2.赛程 / 数据
@@ -21,3 +32,12 @@
    assistsPg 场均助攻
    tppct 三分%
    ftpct 罚球%
+
+
+
+   playoffStat.playerTeams 季后赛数据
+   regularSeasonStat.playerTeams 职业生涯数据
+   allStarStat.playerTeams  全明星数据
+   playerSplit.splits 分类数据
+   seasonGames 比赛日志
+   currentSeasonTypeStat.currentSeasonTypePlayerTeamStats[0].statAverage

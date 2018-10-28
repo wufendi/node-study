@@ -5,34 +5,45 @@ const getAllTeamData = require('./getAllTeamData');
 const http = require('http');
 const db = mongoose.connection;
 const Schema = mongoose.Schema;
-function setData(name) {
-    let teamDetailModel;
-    let teamDetailSchema;
+let currentModel;
+let currentSchema;
+let i = 0
+currentSchema = new Schema({// http://china.nba.com/static/data/player/stats_alex_abrines.json
+    name: String,
+    monthGroups: Array, // 赛程 http://china.nba.com/static/data/team/schedule_warriors.json data.payload.monthGroups
+    data: Array, // 数据 常规赛/季后赛 http://china.nba.com/static/data/team/stats_warriors.json data.payload。seasons
+    info: Object, // 教练 http://china.nba.com/static/data/team/standing_warriors.json
+    datace: Object, // 数据王 http://china.nba.com/static/data/team/leader_warriors.json data.payload.{}
+    players: Array, // 球员 http://china.nba.com/static/data/team/playerstats_warriors.json
+    contrast: Array, //对比 http://china.nba.com/static/data/team/hotzone_warriors.json http://china.nba.com/static/data/league/teamhotzone.json
+}, {collection:'teamDetail'});
+currentModel = mongoose.model('teamDetail', currentSchema);
+function setData(name, isRemove) {
     name = name.toLowerCase();
-    teamDetailSchema = new Schema({
-        monthGroups: Array, // 赛程 http://china.nba.com/static/data/team/schedule_warriors.json data.payload.monthGroups
-        data: Array, // 数据 常规赛/季后赛 http://china.nba.com/static/data/team/stats_warriors.json data.payload。seasons
-        info: Object, // 教练 http://china.nba.com/static/data/team/standing_warriors.json
-        datace: Object, // 数据王 http://china.nba.com/static/data/team/leader_warriors.json data.payload.{}
-        players: Array, // 球员 http://china.nba.com/static/data/team/playerstats_warriors.json
-        contrast: Array, //对比 http://china.nba.com/static/data/team/hotzone_warriors.json http://china.nba.com/static/data/league/teamhotzone.json
-    }, {collection:name});
-    teamDetailModel = mongoose.model(name, teamDetailSchema);
-    teamDetailModel.create({monthGroups:[],data:[],info:{},datace:{},players: [],contrast:[]}, (err) => {
+    const data = {
+        name,
+        monthGroups: [],
+        data: [],
+        info: {},
+        datace: {},
+        players: [],
+        contrast: [],
+    }
+    if (isRemove) {
+        currentModel.remove(function () {});
+    }
+    console.log(i++);
+    currentModel.create(data, (err) => {
         if (err) {
             throw err;
-        } else {
-            console.log('初始化成功');
         }
-    });
-    teamDetailModel.remove(function () {});
-
-    getMonthGroupsData(name, teamDetailModel);
-    getSeasonsData(name, teamDetailModel);
-    getInfoData(name, teamDetailModel);
-    getDatace(name, teamDetailModel);
-    getPlayersData(name, teamDetailModel);
-    getContrastData(name, teamDetailModel);
+    })
+    getMonthGroupsData(name, currentModel);
+    getSeasonsData(name, currentModel);
+    getInfoData(name, currentModel);
+    getDatace(name, currentModel);
+    getPlayersData(name, currentModel);
+    getContrastData(name, currentModel);
 }
 function getData(url,fn) {
     http.get(url, (res) => {
@@ -51,14 +62,9 @@ function getData(url,fn) {
 function getMonthGroupsData(name, modal) {
     const url = `http://china.nba.com/static/data/team/schedule_${name}.json`;
     getData(url,(data)=>{
-        const _data = {
-            monthGroups: data.monthGroups
-        }
-        modal.updateOne(_data, (err) => {
+        modal.findOneAndUpdate({name}, { $set: { monthGroups: data.monthGroups }}, (err) => {
             if (err) {
                 throw err;
-            } else {
-                console.log('插入成功');
             }
         })
     });
@@ -66,14 +72,9 @@ function getMonthGroupsData(name, modal) {
 function getSeasonsData(name, modal) {
     const url = `http://china.nba.com/static/data/team/stats_${name}.json`;
     getData(url,(data)=>{
-        const _data = {
-            data: data.seasons
-        }
-        modal.updateOne(_data, (err) => {
+        modal.findOneAndUpdate({name}, { $set: { data: data.seasons }}, (err) => {
             if (err) {
                 throw err;
-            } else {
-                console.log('插入成功');
             }
         })
     });
@@ -81,78 +82,47 @@ function getSeasonsData(name, modal) {
 function getInfoData(name, modal) {
     const url = `http://china.nba.com/static/data/team/standing_${name}.json`;
     getData(url,(data)=>{
-        const _data = {
-            info: data.team
-        }
-        modal.updateOne(_data, (err) => {
+        modal.findOneAndUpdate({name}, { $set: { info: data.team }}, (err) => {
             if (err) {
                 throw err;
-            } else {
-                console.log('插入成功');
             }
-        })
+        });
     });
 }
 function getDatace(name, modal) {
     const url = `http://china.nba.com/static/data/team/leader_${name}.json`;
     getData(url,(data)=>{
-        const _data = {
-            datace: data
-        }
-        modal.updateOne(_data, (err) => {
+        modal.findOneAndUpdate({name}, { $set: { datace: data }}, (err) => {
             if (err) {
                 throw err;
-            } else {
-                console.log('插入成功');
             }
-        })
+        });
     });
 }
 function getPlayersData(name, modal) {
     const url = `http://china.nba.com/static/data/team/playerstats_${name}.json`;
     getData(url,(data)=>{
-        const _data = {
-            players: data.team.players
-        }
-        modal.updateOne(_data, (err) => {
+        modal.findOneAndUpdate({name}, { $set: { players: data.team.players }}, (err) => {
             if (err) {
                 throw err;
-            } else {
-                console.log('插入成功');
             }
-        })
+        });
     });
 }
 function getContrastData(name, modal) {
     const url = `http://china.nba.com/static/data/team/hotzone_${name}.json`;
     getData(url,(data)=>{
-        const _data = {
-            contrast: data.hotZone.seasons
-        }
-        modal.updateOne(_data, (err) => {
+        modal.findOneAndUpdate({name}, { $set: { contrast: data.hotZone.seasons }}, (err) => {
             if (err) {
                 throw err;
-            } else {
-                console.log('插入成功');
             }
-        })
+        });
     });
 }
 
-
-mongoose.connect('mongodb://localhost/teamDetail');
-db.on('error',() => {
-    console.log('连接失败')
-});
-db.once('open', function() {
-    console.log('连接成功')
-});
-db.once('close', function() {
-    console.log('断开成功')
-});
 // setData('warriors');
 getAllTeamData({code: 1}, (data) => {
-    mongoose.connect('mongodb://localhost/teamDetail');
+    mongoose.connect('mongodb://localhost/nba');
     db.on('error',() => {
         console.log('连接失败')
     });
@@ -164,6 +134,9 @@ getAllTeamData({code: 1}, (data) => {
     });
     // 以上 如果放在外面 数据会保存在NBA中
     data.forEach((v, i) => {
-        setData(v.code);
+        const isRemove = i === 0;
+        setTimeout(()=> {
+            setData(v.code, isRemove);
+        }, i*10000)
     })
 })
