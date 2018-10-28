@@ -1,0 +1,25 @@
+{
+  "name": "study",
+  "version": "1.0.0",
+  "description": "node study",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wufendi/node-study.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wufendi/node-study/issues"
+  },
+  "homepage": "https://github.com/wufendi/node-study#readme",
+  "dependencies": {
+    "mongoose": "^5.2.6"
+  },
+  "devDependencies": {
+    "cheerio": "^1.0.0-rc.2"
+  }
+}
